@@ -1,0 +1,12 @@
+.vertical-scroll thead, tbody, tr  {
+     display: block;
+}
+.vertical-scroll tbody {
+     overflow: auto;
+     height: 380px;
+     width: 100%;
+}
+
+.vertical-scroll th, td {
+     width: 210px;
+}
