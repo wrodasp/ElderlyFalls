@@ -6,5 +6,15 @@ class Caida(models.Model):
     ubicacion = models.TextField(max_length=255)
     imagen = models.ImageField(upload_to='caidas/')
 
-    def __str__(self):
-        return f'Fecha={self.fecha} | Ubicacion={self.ubicacion}'
+class Persona(models.Model):
+    cedula = models.TextField(max_length=10)
+    nombre = models.TextField(max_length=50)
+    apellido = models.TextField(max_length=50)
+
+class Usuario(models.Model):
+    persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
+    clave = models.TextField(max_length=15)
+
+class Contacto(models.Model):
+    persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
+    telefono = models.TextField(max_length=10)

@@ -2,5 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.go_index, name='index')
+    path('', views.iniciar_sesion, name='login'),
+    path('cerrar_sesion/', views.cerrar_sesion, name='logout')
 ]
