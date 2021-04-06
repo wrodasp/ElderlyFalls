@@ -12,9 +12,9 @@ class Persona(models.Model):
     apellido = models.TextField(max_length=50)
 
 class Usuario(models.Model):
-    persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
+    persona = models.OneToOneField(Persona, on_delete=models.CASCADE)
     clave = models.TextField(max_length=15)
 
 class Contacto(models.Model):
-    persona = models.ForeignKey(Persona, on_delete=models.CASCADE)
+    persona = models.OneToOneField(Persona, on_delete=models.CASCADE)
     telefono = models.TextField(max_length=10)
