@@ -4,10 +4,12 @@ from . import views
 
 urlpatterns = [
     #Vistas
-    path('', views.login, name='login'),
-    path('logout/', views.logout, name='logout'),
-    path('administracion/', views.administracion, name='administracion'),
-
+    path('', views.login),
+    path('logout/', views.logout),
+    path('administracion/', views.administracion),
+    path('administracion/usuarios', views.usuarios),
+    path('administracion/usuario/eliminar/<int:id>', views.eliminar_usuario),
     #API REST
-    path('rest/validar-usuario', servicios.LoginView.as_view(), name='validar-usuario')
+    path('rest/validar-usuario', servicios.LoginView.as_view()),
+
 ]

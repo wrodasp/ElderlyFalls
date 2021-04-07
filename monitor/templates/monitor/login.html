@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
      <head>
           {% load static %}
           {% load bootstrap4 %}
@@ -9,12 +9,16 @@
           <script type="text/javascript" src="{% static 'monitor/js/login.js' %}"></script>
           <meta charset="utf-8">
           <title>Elderly Falls</title>
-          {% bootstrap_javascript jquery='full' %}
      </head>
      <body>
-          <div class="container">
+          <div class="container mx-auto">
                <form class="form-group border mx-auto wrap" method="POST">
                     {% csrf_token %}
+                    {% if mensaje != "" %}
+                         <div class="alert alert-danger text-center" role="alert">
+                              {{mensaje}}
+                         </div>
+                    {% endif %}
                     <img class="mx-auto d-block mt-2"
                          src="{% static 'monitor/logo_ups.png' %}"
                          width="350" height="100">

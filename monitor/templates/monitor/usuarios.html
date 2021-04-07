@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+     <head>
+          {% load static %}
+          {% load bootstrap4 %}
+          {% bootstrap_css %}
+
+          <link rel="stylesheet" type="text/css" href="{% static 'monitor/css/administrador.css' %}">
+          <meta charset="utf-8">
+          <title>Elderly Falls</title>
+     </head>
+     <body>
+          <div class="mx-2">
+               <div class="row my-2">
+                    <h4 class="col ml-2">
+                         Bienvenido, {{usuario_autenticado.nombre}} {{usuario_autenticado.apellido}}
+                    </h4>
+                    <form class="col mb-2" action="/logout" method="GET">
+                         {% csrf_token %}
+                         <div align="right">
+                              <a class="btn btn-info text-center"
+                                 href="/administracion"
+                                 style="width:15%" role="button">Monitor
+                              </a>
+                              <button class="btn btn-primary text-center mr-2"
+                                      style="width:20%" type="submit">Cerrar sesión
+                              </button>
+                         </div>
+                    </form>
+               </div>
+               <div class="border rounded">
+                    <table class="table table-striped vertical-scroll mx-4 my-2">
+                         <thead>
+                              <tr>
+                                   <th class="text-center">Nro. Registro</th>
+                                   <th class="text-center">Cédula</th>
+                                   <th class="text-center">Nombre</th>
+                                   <th class="text-center">Apellido</th>
+                                   <th class="text-center">Tipo</th>
+                                   <th class="text-center">Acción</th>
+                              </tr>
+                         </thead>
+                         <tbody>
+                              {% if usuarios %}
+                                   {% for usuario in usuarios %}
+                                        <tr>
+                                             <td class="text-center">{{usuario.id}}</td>
+                                             <td class="text-center">{{usuario.cedula}}</td>
+                                             <td class="text-center">{{usuario.nombre}}</td>
+                                             <td class="text-center">{{usuario.apellido}}</td>
+                                             <td class="text-center">{{usuario.tipo}}</td>
+                                             <td class="text-center">
+                                                  {% if usuario.cedula == usuario_autenticado.cedula %}
+                                                       No permitido
+                                                  {% else %}
+                                                       <a class="btn btn-warning text-center"
+                                                          href="/administracion/usuarios/{{usuario.id}}"
+                                                          role="button">Editar
+                                                       </a>
+                                                       <a class="btn btn-danger text-center"
+                                                          href="/administracion/usuarios"
+                                                          role="button" onclick="">Eliminar
+                                                       </a>
+                                                  {% endif %}
+                                             </td>
+                                        </tr>
+                                   {% endfor %}
+                              {% endif %}
+                         </tbody>
+                    </table>
+               </div>
+          </div>
+          {% bootstrap_javascript jquery='full' %}
+     </body>
+</html>
