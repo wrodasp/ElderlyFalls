@@ -10,10 +10,10 @@ class Caida(models.Model):
         return f'{self.pk} -> {self.fecha} | {self.ubicacion}'
 
 class Persona(models.Model):
-    cedula = models.TextField(max_length=10)
+    cedula = models.TextField(max_length=10, unique=True)
     nombre = models.TextField(max_length=50)
     apellido = models.TextField(max_length=50)
-
+    
     def __str__(self):
         return f'{self.cedula} -> {self.nombre}  {self.apellido}'
 

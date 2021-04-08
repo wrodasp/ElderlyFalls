@@ -30,7 +30,6 @@
                     <table class="table table-striped vertical-scroll mx-4 my-2">
                          <thead>
                               <tr>
-                                   <th class="text-center">Nro. Registro</th>
                                    <th class="text-center">Cédula</th>
                                    <th class="text-center">Nombre</th>
                                    <th class="text-center">Apellido</th>
@@ -47,7 +46,6 @@
                               {% if usuarios %}
                                    {% for usuario in usuarios %}
                                         <tr>
-                                             <td class="text-center">{{usuario.id}}</td>
                                              <td class="text-center">{{usuario.cedula}}</td>
                                              <td class="text-center">{{usuario.nombre}}</td>
                                              <td class="text-center">{{usuario.apellido}}</td>
@@ -60,10 +58,41 @@
                                                           href="/administracion/usuarios/editar/{{usuario.id}}"
                                                           role="button">Editar
                                                        </a>
-                                                       <a class="btn btn-danger text-center"
-                                                          href="/administracion/usuarios/eliminar/{{usuario.id}}"
-                                                          role="button" onclick="">Eliminar
-                                                       </a>
+                                                       <button class="btn btn-danger text-center"
+                                                               type="button" data-toggle="modal"
+                                                               data-target="#confirmacion">Eliminar
+                                                       </button>
+
+                                                       <!-- Modal -->
+                                                       <div class="modal fade" id="confirmacion" tabindex="-1"
+                                                            role="dialog" aria-labelledby="exampleModalLabel"
+                                                            aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+                                                                 <div class="modal-content">
+                                                                      <div class="modal-header">
+                                                                           <h5 class="modal-title" id="exampleModalLabel">
+                                                                                Modal title
+                                                                           </h5>
+                                                                           <button type="button" class="close"
+                                                                                   data-dismiss="modal" aria-label="Close">
+                                                                                <span aria-hidden="true">&times;</span>
+                                                                           </button>
+                                                                      </div>
+                                                                      <div class="modal-body">
+                                                                           ¿Esta seguro de eliminar este usuario?
+                                                                      </div>
+                                                                      <div class="modal-footer">
+                                                                           <button type="button" class="btn btn-secondary"
+                                                                                   data-dismiss="modal">Cancelar
+                                                                           </button>
+                                                                           <a class="btn btn-danger text-center"
+                                                                              href="/administracion/usuarios/eliminar/{{usuario.id}}"
+                                                                              role="button">Confirmar
+                                                                           </a>
+                                                                      </div>
+                                                                 </div>
+                                                            </div>
+                                                       </div>
                                                   {% endif %}
                                              </td>
                                         </tr>

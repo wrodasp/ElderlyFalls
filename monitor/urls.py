@@ -9,8 +9,9 @@ urlpatterns = [
     path('administracion/', views.administracion),
     path('administracion/usuarios', views.usuarios),
     path('administracion/usuarios/agregar', views.agregar_usuario),
-    path('administracion/usuarios/editar/<int:_id>', views.agregar_usuario),
+    path('administracion/usuarios/editar/<int:_id>', views.editar_usuario),
     path('administracion/usuarios/eliminar/<int:_id>', views.eliminar_usuario),
     #API REST
-    path('rest/validar-usuario', servicios.LoginView.as_view()),
+    path('rest/validar-usuario', servicios.LoginService.as_view()),
+    path('rest/listar-caidas', servicios.CaidaService.as_view())
 ]

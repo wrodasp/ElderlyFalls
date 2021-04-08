@@ -1,9 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from .serializadores import CaidaSerializer
 from .views import validar_usuario
+from .models import Caida
 
-class LoginView(APIView):
+class LoginService(APIView):
 
     def get(self, request):
         try:
@@ -13,5 +15,15 @@ class LoginView(APIView):
                 'resultado': validar_usuario(cedula, clave)
             }
             return Response(resultado, content_type='text/plain')
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class CaidaService(APIView):
+
+    def get(self, request):
+        try:
+            caidas = Caida.objects.all()
+            serializer = CaidaSerializer(caidas, many=True)
+            return Response(serializer.data)
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
