@@ -12,6 +12,6 @@ class LoginView(APIView):
             resultado = {
                 'resultado': validar_usuario(cedula, clave)
             }
-            return Response(resultado)
+            return Response(resultado, content_type='text/plain')
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
