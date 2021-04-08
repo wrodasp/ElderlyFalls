@@ -6,7 +6,7 @@
           {% bootstrap_css %}
 
           <link rel="stylesheet" type="text/css" href="{% static 'monitor/css/login.css' %}">
-          <script type="text/javascript" src="{% static 'monitor/js/login.js' %}"></script>
+          <script type="text/javascript" src="{% static 'monitor/js/validaciones.js' %}"></script>
           <meta charset="utf-8">
           <title>Elderly Falls</title>
      </head>
@@ -28,9 +28,9 @@
                            onkeypress="return esNumero(event)" required><br>
                     <input class="form-control text-center mx-auto" style="width:50%"
                            type="password" name="clave" placeholder="Contraseña"
-                           maxlength="15" required>
+                           maxlength="30" required>
                     <button class="form-control text-center btn-primary mx-auto my-3"
-                            style="width:35%" type="submit"> Iniciar sesión
+                            style="width:35%" type="submit">Iniciar sesión
                     </button>
                </form>
           </div>

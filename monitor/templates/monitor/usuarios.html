@@ -11,22 +11,20 @@
      </head>
      <body>
           <div class="mx-2">
-               <div class="row my-2">
+               <div class="row my-2 mr-2">
                     <h4 class="col ml-2">
                          Bienvenido, {{usuario_autenticado.nombre}} {{usuario_autenticado.apellido}}
                     </h4>
-                    <form class="col mb-2" action="/logout" method="GET">
-                         {% csrf_token %}
-                         <div align="right">
-                              <a class="btn btn-info text-center"
-                                 href="/administracion"
-                                 style="width:15%" role="button">Monitor
-                              </a>
-                              <button class="btn btn-primary text-center mr-2"
-                                      style="width:20%" type="submit">Cerrar sesión
-                              </button>
-                         </div>
-                    </form>
+                    <div class="col" align="right">
+                         <a class="btn btn-info text-center"
+                            href="/administracion"
+                            style="width:20%" role="button">Monitor
+                         </a>
+                         <a class="btn btn-primary text-center"
+                            href="/logout"
+                            style="width:20%" role="button">Cerrar sesión
+                         </a>
+                    </div>
                </div>
                <div class="border rounded">
                     <table class="table table-striped vertical-scroll mx-4 my-2">
@@ -37,7 +35,12 @@
                                    <th class="text-center">Nombre</th>
                                    <th class="text-center">Apellido</th>
                                    <th class="text-center">Tipo</th>
-                                   <th class="text-center">Acción</th>
+                                   <th class="text-center">
+                                        <a class="btn btn-info text-center"
+                                           href="/administracion/usuarios/agregar"
+                                           role="button">Agregar
+                                        </a>
+                                   </th>
                               </tr>
                          </thead>
                          <tbody>
@@ -50,15 +53,15 @@
                                              <td class="text-center">{{usuario.apellido}}</td>
                                              <td class="text-center">{{usuario.tipo}}</td>
                                              <td class="text-center">
-                                                  {% if usuario.cedula == usuario_autenticado.cedula %}
+                                                  {% if usuario.id == usuario_autenticado.id %}
                                                        No permitido
                                                   {% else %}
                                                        <a class="btn btn-warning text-center"
-                                                          href="/administracion/usuarios/{{usuario.id}}"
+                                                          href="/administracion/usuarios/editar/{{usuario.id}}"
                                                           role="button">Editar
                                                        </a>
                                                        <a class="btn btn-danger text-center"
-                                                          href="/administracion/usuarios"
+                                                          href="/administracion/usuarios/eliminar/{{usuario.id}}"
                                                           role="button" onclick="">Eliminar
                                                        </a>
                                                   {% endif %}

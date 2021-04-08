@@ -11,22 +11,20 @@
      </head>
      <body>
           <div>
-               <div class="row mt-2">
+               <div class="row my-2 mr-2">
                     <h4 class="col ml-2">
                          Bienvenido, {{usuario_autenticado.nombre}} {{usuario_autenticado.apellido}}
                     </h4>
-                    <form class="col mb-2" action="/logout">
-                         {% csrf_token %}
-                         <div align="right">
-                              <a class="btn btn-info text-center"
-                                 href="/administracion/usuarios"
-                                 style="width:15%" role="button">Usuarios
-                              </a>
-                              <button class="btn btn-primary text-center mr-2"
-                                      style="width:20%" type="submit">Cerrar sesión
-                              </button>
-                         </div>
-                    </form>
+                    <div class="col" align="right">
+                         <a class="btn btn-info text-center"
+                            href="/administracion/usuarios"
+                            style="width:20%" role="button">Usuarios
+                         </a>
+                         <a class="btn btn-primary text-center"
+                            href="/logout"
+                            style="width:20%" role="button">Cerrar sesión
+                         </a>
+                    </div>
                </div>
                <div class="row ml-2 mr-2">
                     <div class="col col-lg-8 border rounded">

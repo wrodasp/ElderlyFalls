@@ -8,8 +8,9 @@ urlpatterns = [
     path('logout/', views.logout),
     path('administracion/', views.administracion),
     path('administracion/usuarios', views.usuarios),
-    path('administracion/usuario/eliminar/<int:id>', views.eliminar_usuario),
+    path('administracion/usuarios/agregar', views.agregar_usuario),
+    path('administracion/usuarios/editar/<int:_id>', views.agregar_usuario),
+    path('administracion/usuarios/eliminar/<int:_id>', views.eliminar_usuario),
     #API REST
     path('rest/validar-usuario', servicios.LoginView.as_view()),
-
 ]

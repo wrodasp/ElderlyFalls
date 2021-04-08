@@ -19,7 +19,7 @@ class Persona(models.Model):
 
 class Usuario(models.Model):
     persona = models.OneToOneField(Persona, on_delete=models.CASCADE)
-    clave = models.TextField(max_length=15)
+    clave = models.TextField(max_length=30)
     tipo = models.TextField(max_length=10, default='regular')
 
     def __str__(self):
