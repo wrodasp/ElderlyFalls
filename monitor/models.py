@@ -1,66 +1,55 @@
 from django.db import models
 
 # Create your models here.
-class Caida(models.Model):
-    fecha = models.DateTimeField(auto_now=True)
-    ubicacion = models.TextField(max_length=255)
-    imagen = models.ImageField(upload_to='monitor/caidas')
-
-    def __str__(self):
-        return f'{self.pk} -> {self.fecha} | {self.ubicacion}'
-
-    def __json__(self):
-        return {
-            'id': self.id,
-            'fecha': self.fecha,
-            'ubicacion': self.ubicacion,
-            'imagen': self.imagen
-        }
-
 class Persona(models.Model):
-    cedula = models.TextField(max_length=10, unique=True)
     nombre = models.TextField(max_length=50)
     apellido = models.TextField(max_length=50)
 
     def __str__(self):
-        return f'{self.cedula} -> {self.nombre}  {self.apellido}'
+        return f'{self.nombre} {self.apellido}'
 
     def __json__(self):
         return {
             'id': self.id,
-            'cedula': self.cedula,
             'nombre': self.nombre,
             'apellido': self.apellido
         }
 
 class Usuario(models.Model):
-    persona = models.OneToOneField(Persona, on_delete=models.CASCADE)
+    correo = models.EmailField(max_length=255, default='')
     clave = models.TextField(max_length=30)
     tipo = models.TextField(max_length=10, default='regular')
+    persona = models.OneToOneField(Persona, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.persona.__str__()} | {self.tipo}'
+        return f'{self.correo} | {self.tipo}'
 
     def __json__(self):
         return {
             'id': self.id,
+            'correo': self.correo,
             'clave': self.clave,
             'tipo': self.tipo,
             'persona': self.persona.__json__()
         }
 
+class Paciente(models.Model):
+    persona = models.OneToOneField(Persona, on_delete=models.CASCADE)
+    fecha_nacimiento = models.DateField()
+
+    def __str__(self):
+        return f'{self.persona.__json__()} | {self.fecha_nacimiento.strftime("%b %d %Y")}'
+
+    def __json__(self):
+        return {
+            'id': self.id,
+            'fecha-nacimiento': self.fecha_nacimiento,
+            'persona': self.persona.__json__()
+        }
+
 class Contacto(models.Model):
-    paciente = models.ForeignKey(
-        Persona,
-        on_delete=models.CASCADE,
-        related_name='contactos',
-        default=None
-    )
-    familiar = models.OneToOneField(
-        Persona,
-        on_delete=models.CASCADE,
-        default=None
-    )
+    familiar = models.OneToOneField(Persona, on_delete=models.CASCADE)
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
     telefono = models.TextField(max_length=10, unique=True)
 
     def __str__(self):
@@ -70,6 +59,24 @@ class Contacto(models.Model):
         return {
             'id': self.id,
             'telefono': self.telefono,
-            'paciente': self.paciente.__json__(),
-            'familiar': self.familiar.__json__()
+            'familiar': self.familiar.__json__(),
+            'paciente': self.paciente.__json__()
+        }
+
+class Caida(models.Model):
+    fecha = models.DateTimeField(auto_now=True)
+    presicion = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    imagen = models.ImageField(upload_to='monitor/caidas')
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, default=None)
+
+    def __str__(self):
+        return f'{self.fecha.strftime("%b %d %Y %H:%M:%S")} | {self.ubicacion}'
+
+    def __json__(self):
+        return {
+            'id': self.id,
+            'fecha': self.fecha.strftime("%b %d %Y %H:%M:%S"),
+            'presicion': self.presicion,
+            'imagen': self.imagen,
+            'paciente': self.paciente.__json__()
         }

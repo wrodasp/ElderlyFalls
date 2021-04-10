@@ -10,15 +10,8 @@
           <script type="text/javascript" src="{% static 'monitor/js/extras.js' %}"></script>
           <meta charset="utf-8">
           <title>Elderly Falls</title>
-          <style>
-               .fondo {
-                    background-image: url('{% static "fondo.png" %}');
-                    background-size: 100% 100%;
-                    background-repeat: no-repeat
-               }
-          </style>
      </head>
-     <body class="fondo">
+     <body>
           <div>
                <div class="row my-2 mr-2">
                     <h4 class="col ml-2">
@@ -57,9 +50,8 @@
                               </div>
                          {% endif %}
                          <input class="form-control text-center mt-3 mx-auto"
-                                style="width: 70%" type="text" pattern="[0-9]{10}"
-                                name="cedula" placeholder="Cedula" maxlength="10"
-                                onkeypress="return esNumero(event)"
+                                style="width: 70%" type="email" pattern="[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})"
+                                name="correo" placeholder="Correo electrónico" maxlength="100"
                                 value={{usuario.persona.cedula}} required>
                          <input class="form-control text-center mt-2 mx-auto"
                                 style="width: 70%" type="text" maxlength="50"

@@ -9,15 +9,8 @@
           <link rel="stylesheet" type="text/css" href="{% static 'monitor/css/monitor.css' %}">
           <meta charset="utf-8">
           <title>Elderly Falls</title>
-          <style>
-               .fondo {
-                    background-image: url('{% static "fondo.png" %}');
-                    background-size: 100% 100%;
-                    background-repeat: no-repeat
-               }
-          </style>
      </head>
-     <body class="fondo">
+     <body>
           <div class="mx-2">
                <div class="row my-2 mr-2">
                     <h5 class="col ml-2">
@@ -38,82 +31,51 @@
                          </a>
                     </div>
                </div>
-               <div class="border rounded">
-                    <table class="table table-wrapper vertical-scroll mt-2">
-                         <thead>
-                              <tr class="row justify-content-center text-center">
-                                   <th class="col">Cédula</th>
-                                   <th class="col">Nombre</th>
-                                   <th class="col">Apellido</th>
-                                   <th class="col">Tipo</th>
-                                   <th class="col">
-                                        <a class="btn btn-info text-center"
-                                           href="/administracion/usuarios/agregar"
-                                           role="button">Agregar
-                                        </a>
-                                   </th>
-                              </tr>
-                         </thead>
-                         <tbody style="height: 500px;">
-                              {% if usuarios %}
-                                   {% for usuario in usuarios %}
-                                        <tr class="row justify-content-center text-center">
-                                             <td class="col">{{usuario.persona.cedula}}</td>
-                                             <td class="col">{{usuario.persona.nombre}}</td>
-                                             <td class="col">{{usuario.persona.apellido}}</td>
-                                             <td class="col">{{usuario.tipo}}</td>
-                                             <td class="col">
-                                                  {% if usuario.persona.id == usuario_autenticado.id %}
-                                                       --------
-                                                  {% else %}
-                                                       <a class="btn btn-warning text-center"
-                                                          href="/administracion/usuarios/editar/{{usuario.id}}"
-                                                          role="button">Editar
-                                                       </a>
-                                                       <button class="btn btn-danger text-center"
-                                                               type="button" data-toggle="modal"
-                                                               data-target="#confirmacion">Eliminar
-                                                       </button>
-
-                                                       <!-- Modal -->
-                                                       <div class="modal fade" id="confirmacion" tabindex="-1"
-                                                            role="dialog" aria-labelledby="exampleModalLabel"
-                                                            aria-hidden="true">
-                                                            <div class="modal-dialog" role="document">
-                                                                 <div class="modal-content">
-                                                                      <div class="modal-header">
-                                                                           <h5 class="modal-title" id="exampleModalLabel">
-                                                                                Usuario a eliminar
-                                                                           </h5>
-                                                                           <button type="button" class="close"
-                                                                                   data-dismiss="modal" aria-label="Close">
-                                                                                <span aria-hidden="true">&times;</span>
-                                                                           </button>
-                                                                      </div>
-                                                                      <div class="modal-body">
-                                                                           ¿Esta seguro de eliminar este usuario?
-                                                                      </div>
-                                                                      <div class="modal-footer">
-                                                                           <button type="button" class="btn btn-secondary"
-                                                                                   data-dismiss="modal">Cancelar
-                                                                           </button>
-                                                                           <a class="btn btn-danger text-center"
-                                                                              href="/administracion/usuarios/eliminar/{{usuario.id}}"
-                                                                              role="button">Confirmar
-                                                                           </a>
-                                                                      </div>
-                                                                 </div>
-                                                            </div>
-                                                       </div>
-                                                  {% endif %}
-                                             </td>
-                                        </tr>
-                                   {% endfor %}
-                              {% endif %}
-                         </tbody>
-                    </table>
-               </div>
-          </div>
+               <table class="table vertical-scroll mx-auto mt-4" style="width: 90%">
+                    <thead class="mx-auto">
+                         <tr class="row justify-content-center text-center">
+                              <th class="col">Nombre</th>
+                              <th class="col">Apellido</th>
+                              <th class="col">Correo</th>
+                              <th class="col">Tipo</th>
+                              <th class="col">
+                                   <a class="btn btn-info text-center"
+                                      href="/administracion/usuarios/agregar"
+                                      role="button">Agregar
+                                   </a>
+                              </th>
+                         </tr>
+                    </thead>
+                    <tbody class="mx-auto" style="height: 500px">
+                         {% if usuarios %}
+                              {% for usuario in usuarios %}
+                                   <tr class="row justify-content-center text-center">
+                                        <td class="col">{{usuario.persona.nombre}}</td>
+                                        <td class="col">{{usuario.persona.apellido}}</td>
+                                        <td class="col">{{usuario.correo}}</td>
+                                        <td class="col">{{usuario.tipo}}</td>
+                                        <td class="col">
+                                             {% if usuario.id == usuario_autenticado.id %}
+                                                  <a class="btn btn-warning text-center"
+                                                     href="/administracion/usuarios/editar/{{usuario.id}}"
+                                                     role="button">Editar
+                                                  </a>
+                                             {% else %}
+                                                  <a class="btn btn-warning text-center"
+                                                     href="/administracion/usuarios/editar/{{usuario.id}}"
+                                                     role="button">Editar
+                                                  </a>
+                                                  <a class="btn btn-danger text-center"
+                                                     href="/administracion/usuarios/eliminar/{{usuario.id}}"
+                                                     role="button">Eliminar
+                                                  </a>
+                                             {% endif %}
+                                        </td>
+                                   </tr>
+                              {% endfor %}
+                         {% endif %}
+                    </tbody>
+               </table>
           {% bootstrap_javascript jquery='full' %}
      </body>
 </html>

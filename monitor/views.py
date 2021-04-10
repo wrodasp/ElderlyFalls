@@ -1,11 +1,11 @@
 from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import redirect
-from .models import Caida, Persona, Usuario
+from .models import Persona, Usuario, Contacto, Paciente, Caida
 
-def validar_usuario(cedula, clave):
+def validar_usuario(correo, clave):
     try:
-        usuario = Usuario.objects.get(persona__cedula=cedula)
+        usuario = Usuario.objects.get(correo=correo)
         return clave == usuario.clave
     except Exception:
         return None
@@ -18,18 +18,18 @@ def login(request):
             html = loader.get_template('monitor/login.html')
             mensaje = ''
             if request.method == 'POST':
-                cedula = request.POST.get('cedula', '')
+                correo = request.POST.get('correo', '')
                 clave = request.POST.get('clave', '')
-                usuario_valido = validar_usuario(cedula, clave)
+                usuario_valido = validar_usuario(correo, clave)
                 if usuario_valido is not None:
                     if usuario_valido:
-                        usuario = Usuario.objects.select_related().get(persona__cedula=cedula)
+                        usuario = Usuario.objects.select_related().get(correo=correo)
                         request.session['usuario_autenticado'] = usuario.__json__()
                         return redirect('administracion/')
                     else:
                         mensaje = 'Inicio de sesión fallido. La contraseña es incorrecta.'
                 else:
-                    mensaje = f'Inicio de sesión fallido. El usuario {cedula} no existe'
+                    mensaje = f'Inicio de sesión fallido. El usuario {correo} no existe'
             contexto = {
                 'mensaje': mensaje
             }
@@ -50,18 +50,20 @@ def administracion(request):
     try:
         if request.session['usuario_autenticado'] is not None:
             html = loader.get_template('monitor/administrador.html')
-            resultado = Caida.objects.all()
+            resultado = Caida.objects.select_related().all()
             caidas = [caida.__json__() for caida in resultado]
             contexto = {
                 'caidas': caidas,
+                'total_caidas': len(caidas),
                 'tabla_vacia': range(10),
                 'usuario_autenticado': request.session['usuario_autenticado']
             }
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception:
-        return redirect('/')
+    except Exception as e:
+        print(e)
+        #return redirect('/')
 
 def usuarios(request):
     try:
@@ -86,17 +88,17 @@ def agregar_usuario(request):
             mensaje = ''
             tipo_mensaje = ''
             if request.method == 'POST':
-                _cedula = request.POST.get('cedula', '')
-                resultado = Persona.objects.filter(cedula=_cedula)
+                _correo = request.POST.get('correo', '')
+                resultado = Usuario.objects.filter(correo=_correo)
                 if len(resultado) == 0:
                     _persona = Persona(
-                        cedula=_cedula,
                         nombre=request.POST.get('nombre', ''),
                         apellido=request.POST.get('apellido', '')
                     )
                     _persona.save()
                     usuario = Usuario(
                         persona=_persona,
+                        correo=_correo,
                         clave=request.POST.get('clave', ''),
                         tipo=request.POST.get('tipo', '')
                     )
@@ -123,14 +125,14 @@ def editar_usuario(request, _id):
             html = loader.get_template('monitor/editar-usuario.html')
             mensaje = ''
             tipo_mensaje = ''
-            persona = Persona.objects.get(id=_id)
-            usuario = Usuario.objects.select_related().get(persona__id=persona.id)
+            usuario = Usuario.objects.select_related().get(id=_id)
             if request.method == 'POST':
                 try:
-                    persona.cedula = request.POST.get('cedula', '')
+                    persona = usuario.persona
                     persona.nombre = request.POST.get('nombre', '')
                     persona.apellido = request.POST.get('apellido', '')
                     persona.save()
+                    usuario.correo = request.POST.get('correo', '')
                     usuario.clave = request.POST.get('clave', '')
                     usuario.tipo = request.POST.get('tipo', '')
                     usuario.save()
@@ -149,8 +151,7 @@ def editar_usuario(request, _id):
         else:
             return redirect('/')
     except Exception as e:
-        print(e)
-        return HttpResponse(str(e) + f'{_id}')
+        return redirect('/')
 
 def eliminar_usuario(request, _id):
     try:
@@ -169,9 +170,7 @@ def pacientes(request):
     try:
         if request.session['usuario_autenticado'] is not None:
             html = loader.get_template('monitor/pacientes.html')
-            resultado = Usuario.objects.select_related().all()
-            usuarios = [usuario.persona.cedula for usuario in resultado]
-            pacientes = Persona.objects.exclude(cedula__in=usuarios)
+            pacientes = Paciente.objects.all()
             contexto = {
                 'usuario_autenticado': request.session['usuario_autenticado'],
                 'pacientes': pacientes
@@ -180,7 +179,7 @@ def pacientes(request):
         else:
             return redirect('/')
     except Exception as e:
-        print(e)
+        return redirect('/')
 
 def agregar_paciente(request):
     try:
@@ -188,8 +187,7 @@ def agregar_paciente(request):
             html = loader.get_template('monitor/agregar-paciente.html')
             mensaje = ''
             tipo_mensaje = ''
-            resultado = Usuario.objects.select_related().all()
-            usuarios = [usuario.__json__() for usuario in resultado]
+
             if request.method == 'POST':
                 pass
             contexto = {

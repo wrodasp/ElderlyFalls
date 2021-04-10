@@ -10,15 +10,8 @@
           <script type="text/javascript" src="{% static 'monitor/js/extras.js' %}"></script>
           <meta charset="utf-8">
           <title>Elderly Falls</title>
-          <style>
-               .fondo {
-                    background-image: url('{% static "fondo.png" %}');
-                    background-size: 100% 100%;
-                    background-repeat: no-repeat
-               }
-          </style>
      </head>
-     <body class="fondo">
+     <body>
           <div>
                <div class="row my-2 mr-2">
                     <h4 class="col ml-2">
@@ -57,16 +50,15 @@
                                         {{mensaje}}
                                    </div>
                               {% endif %}
-                              <input class="form-control text-center mt-5 mx-auto"
-                                     style="width: 70%" type="text" pattern="[0-9]{10}"
-                                     name="cedula" placeholder="Cedula" maxlength="10"
-                                     onkeypress="return esNumero(event)" required>
                               <input class="form-control text-center mt-2 mx-auto"
                                      style="width: 70%" type="text" maxlength="50"
                                      name="nombre" placeholder="Nombre" required>
                               <input class="form-control text-center mt-2 mx-auto"
                                      style="width: 70%" type="text" maxlength="50"
                                      name="apellido" placeholder="Apellido" required>
+                              <input class="form-control text-center mt-2 mx-auto"
+                                     style="width: 70%" type="date" maxlength="50"
+                                     name="fecha-nacimiento" placeholder="Fecha de nacimiento" required>
                          </div>
                          <div class="col-md-8">
 
