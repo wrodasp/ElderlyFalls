@@ -5,20 +5,37 @@
           {% load bootstrap4 %}
           {% bootstrap_css %}
 
-          <script type="text/javascript" src="{% static 'monitor/js/validaciones.js' %}"></script>
+          <link rel="shortcut icon" href="{%  static 'favicon.ico' %}">
+          <link rel="stylesheet" type="text/css" href="{% static 'monitor/css/monitor.css' %}">
+          <script type="text/javascript" src="{% static 'monitor/js/extras.js' %}"></script>
           <meta charset="utf-8">
           <title>Elderly Falls</title>
+          <style>
+               .fondo {
+                    background-image: url('{% static "fondo.png" %}');
+                    background-size: 100% 100%;
+                    background-repeat: no-repeat
+               }
+          </style>
      </head>
-     <body>
+     <body class="fondo">
           <div>
                <div class="row my-2 mr-2">
                     <h4 class="col ml-2">
-                         Bienvenido, {{usuario_autenticado.nombre}} {{usuario_autenticado.apellido}}
+                         Bienvenido, {{usuario_autenticado.persona.nombre}} {{usuario_autenticado.persona.apellido}}
                     </h4>
                     <div class="col" align="right">
                          <a class="btn btn-info text-center"
+                            href="/administracion"
+                            style="width:20%" role="button">Monitor
+                         </a>
+                         <a class="btn btn-info text-center"
                             href="/administracion/usuarios"
                             style="width:20%" role="button">Usuarios
+                         </a>
+                         <a class="btn btn-info text-center"
+                            href="/administracion/pacientes"
+                            style="width:20%" role="button">Pacientes
                          </a>
                          <a class="btn btn-primary text-center"
                             href="/logout"
@@ -27,33 +44,34 @@
                     </div>
                </div>
                <div class="container row mx-auto my-5">
-                    <form class="form-group mx-auto border" style="width: 50%" method="POST">
+                    <form class="form-group mx-auto border-thin" style="width: 50%" method="POST">
                          {% csrf_token %}
+                         <h5 class="text-center mt-3">Editar usuario</h5>
                          {% if tipo_mensaje == "exito" %}
-                              <div class="alert alert-success text-center" role="alert">
+                              <div class="alert alert-success text-center mt-2" role="alert">
                                    {{mensaje}}
                               </div>
                          {% elif tipo_mensaje == "error" %}
-                              <div class="alert alert-danger text-center" role="alert">
+                              <div class="alert alert-danger text-center mt-2" role="alert">
                                    {{mensaje}}
                               </div>
                          {% endif %}
-                         <input class="form-control text-center mt-5 mx-auto"
+                         <input class="form-control text-center mt-3 mx-auto"
                                 style="width: 70%" type="text" pattern="[0-9]{10}"
                                 name="cedula" placeholder="Cedula" maxlength="10"
                                 onkeypress="return esNumero(event)"
-                                value={{cedula}} required>
+                                value={{usuario.persona.cedula}} required>
                          <input class="form-control text-center mt-2 mx-auto"
                                 style="width: 70%" type="text" maxlength="50"
                                 name="nombre" placeholder="Nombre"
-                                value={{nombre}} required>
+                                value={{usuario.persona.nombre}} required>
                          <input class="form-control text-center mt-2 mx-auto"
                                 style="width: 70%" type="text" maxlength="50"
                                 name="apellido" placeholder="Apellido"
-                                value={{apellido}} required>
+                                value={{usuario.persona.apellido}} required>
                          <div class="text-center mt-2 mx-auto" style="width: 70%">
                               <select class="form-control" name="tipo" required>
-                                   {% if tipo == "admin" %}
+                                   {% if usuario.tipo == "admin" %}
                                         <option value="admin" selected>Administrador</option>
                                         <option value="regular" >Regular</option>
                                    {% else %}
@@ -64,7 +82,8 @@
                          </div>
                          <input class="form-control text-center mt-2 mx-auto"
                                 style="width: 70%" type="password" maxlength="30"
-                                name="clave" placeholder="Contraseña" required>
+                                name="clave" placeholder="Contraseña"
+                                value="{{usuario.clave}}" required>
                          <button class="form-control text-center btn-primary mx-auto mt-3 mb-5"
                                  style="width:35%" type="button" data-toggle="modal"
                                  data-target="#confirmacion">Guardar
@@ -78,7 +97,7 @@
                                    <div class="modal-content">
                                         <div class="modal-header">
                                              <h5 class="modal-title" id="exampleModalLabel">
-                                                  Modal title
+                                                  Cambios a realizar
                                              </h5>
                                              <button type="button" class="close"
                                                      data-dismiss="modal" aria-label="Close">

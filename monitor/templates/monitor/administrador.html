@@ -5,20 +5,32 @@
           {% load bootstrap4 %}
           {% bootstrap_css %}
 
-          <link rel="stylesheet" type="text/css" href="{% static 'monitor/css/administrador.css' %}">
+          <link rel="shortcut icon" href="{%  static 'favicon.ico' %}">
+          <link rel="stylesheet" type="text/css" href="{% static 'monitor/css/monitor.css' %}">
           <meta charset="utf-8">
           <title>Elderly Falls</title>
+          <style>
+               .fondo {
+                    background-image: url('{% static "fondo.png" %}');
+                    background-size: 100% 100%;
+                    background-repeat: no-repeat
+               }
+          </style>
      </head>
-     <body>
+     <body class="fondo">
           <div>
                <div class="row my-2 mr-2">
-                    <h4 class="col ml-2">
-                         Bienvenido, {{usuario_autenticado.nombre}} {{usuario_autenticado.apellido}}
-                    </h4>
+                    <h5 class="col ml-2">
+                         Bienvenido, {{usuario_autenticado.persona.nombre}} {{usuario_autenticado.persona.apellido}}
+                    </h5>
                     <div class="col" align="right">
                          <a class="btn btn-info text-center"
                             href="/administracion/usuarios"
                             style="width:20%" role="button">Usuarios
+                         </a>
+                         <a class="btn btn-info text-center"
+                            href="/administracion/pacientes"
+                            style="width:20%" role="button">Pacientes
                          </a>
                          <a class="btn btn-primary text-center"
                             href="/logout"
@@ -32,32 +44,32 @@
                               src="{% static 'monitor/logo_ups.png' %}"
                               width="400" height="120">
                          <h3 class="text-center mt-2">Caídas registradas</h3>
-                         <table class="table table-striped vertical-scroll">
+                         <table class="table table-wrapper vertical-scroll">
                               <thead>
-                                   <tr>
-                                        <th class="text-center">Nro. Registro</th>
-                                        <th class="text-center">Fecha y hora</th>
-                                        <th class="text-center">Ubicación</th>
-                                        <th class="text-center">Imagen</th>
+                                   <tr class="row justify-content-center text-center">
+                                        <th class="col">Fecha y hora</th>
+                                        <th class="col">Ubicación</th>
+                                        <th class="col">Imagen</th>
                                    </tr>
                               </thead>
-                              <tbody>
+                              <tbody style="height: 360px;">
                                    {% if caidas %}
                                         {% for caida in caidas %}
-                                             <tr>
-                                                  <td class="text-center">{{caida.id}}</td>
-                                                  <td class="text-center">{{caida.fecha}}</td>
-                                                  <td class="text-center">{{caida.ubicacion}}</td>
-                                                  <td class="text-center">Ver</td>
+                                             <tr class="row justify-content-center text-center">
+                                                  <td class="col">{{caida.fecha}}</td>
+                                                  <td class="col">{{caida.ubicacion}}</td>
+                                                  <td class="col">
+                                                       <img src="{% static caida.imagen.url %}"
+                                                            width="120" height="80">
+                                                  </td>
                                              </tr>
                                         {% endfor %}
                                    {% else %}
                                         {% for i in tabla_vacia %}
-                                             <tr>
-                                                  <td class="text-center">---</td>
-                                                  <td class="text-center">---</td>
-                                                  <td class="text-center">---</td>
-                                                  <td class="text-center">---</td>
+                                             <tr class="row justify-content-center text-center">
+                                                  <td class="col">---</td>
+                                                  <td class="col">---</td>
+                                                  <td class="col">---</td>
                                              </tr>
                                         {% endfor %}
                                    {% endif %}

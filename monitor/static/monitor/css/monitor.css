@@ -1,0 +1,19 @@
+.wrap {
+     margin-top: 10%;
+     margin-bottom: 15%;
+     width: 40%
+}
+
+.border-thin {
+     border: 1px solid gray;
+     border-radius: 20px;
+     box-shadow: 0 0 10px 5px;
+}
+
+.vertical-scroll thead, tbody, tr  {
+     display: block;
+}
+.vertical-scroll tbody {
+     overflow: auto;
+     width: 100%;
+}

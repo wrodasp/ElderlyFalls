@@ -3,50 +3,44 @@ from django.template import loader
 from django.shortcuts import redirect
 from .models import Caida, Persona, Usuario
 
-def validar_usuario(_cedula, clave):
+def validar_usuario(cedula, clave):
     try:
-        usuario = Usuario.objects.get(persona__cedula=_cedula)
+        usuario = Usuario.objects.get(persona__cedula=cedula)
         return clave == usuario.clave
     except Exception:
         return None
 
 def login(request):
     try:
-        if request.session['esta_logueado']:
+        if request.session['usuario_autenticado'] is not None:
             return redirect('administracion/')
         else:
             html = loader.get_template('monitor/login.html')
             mensaje = ''
             if request.method == 'POST':
-                _cedula = request.POST.get('cedula', '')
+                cedula = request.POST.get('cedula', '')
                 clave = request.POST.get('clave', '')
-                usuario_valido = validar_usuario(_cedula, clave)
+                usuario_valido = validar_usuario(cedula, clave)
                 if usuario_valido is not None:
                     if usuario_valido:
-                        persona = Persona.objects.filter(cedula=_cedula)[0]
-                        request.session['esta_logueado'] = True
-                        request.session['usuario_autenticado'] = {
-                            'id': persona.id,
-                            'nombre': persona.nombre,
-                            'apellido': persona.apellido
-                        }
+                        usuario = Usuario.objects.select_related().get(persona__cedula=cedula)
+                        request.session['usuario_autenticado'] = usuario.__json__()
                         return redirect('administracion/')
                     else:
                         mensaje = 'Inicio de sesión fallido. La contraseña es incorrecta.'
                 else:
-                    mensaje = f'Inicio de sesión fallido. El usuario {_cedula} no existe'
+                    mensaje = f'Inicio de sesión fallido. El usuario {cedula} no existe'
             contexto = {
                 'mensaje': mensaje
             }
             return HttpResponse(html.render(contexto, request))
     except Exception:
-        request.session['esta_logueado'] = False
+        request.session['usuario_autenticado'] = None
         return redirect('/')
 
 def logout(request):
     try:
-        if request.session['esta_logueado']:
-            del request.session['esta_logueado']
+        if request.session['usuario_autenticado'] is not None:
             del request.session['usuario_autenticado']
         return redirect('/')
     except Exception:
@@ -54,9 +48,10 @@ def logout(request):
 
 def administracion(request):
     try:
-        if request.session['esta_logueado']:
+        if request.session['usuario_autenticado'] is not None:
             html = loader.get_template('monitor/administrador.html')
-            caidas = Caida.objects.all().order_by('id')
+            resultado = Caida.objects.all()
+            caidas = [caida.__json__() for caida in resultado]
             contexto = {
                 'caidas': caidas,
                 'tabla_vacia': range(10),
@@ -70,18 +65,10 @@ def administracion(request):
 
 def usuarios(request):
     try:
-        if request.session['esta_logueado']:
+        if request.session['usuario_autenticado'] is not None:
             html = loader.get_template('monitor/usuarios.html')
-            resultado = Usuario.objects.all()
-            usuarios = []
-            for usuario in resultado:
-                usuarios.append({
-                    'id': usuario.persona.id,
-                    'cedula': usuario.persona.cedula,
-                    'nombre': usuario.persona.nombre,
-                    'apellido': usuario.persona.apellido,
-                    'tipo': usuario.tipo
-                })
+            resultado = Usuario.objects.select_related().all()
+            usuarios = [usuario.__json__() for usuario in resultado]
             contexto = {
                 'usuario_autenticado': request.session['usuario_autenticado'],
                 'usuarios': usuarios
@@ -94,7 +81,7 @@ def usuarios(request):
 
 def agregar_usuario(request):
     try:
-        if request.session['esta_logueado']:
+        if request.session['usuario_autenticado'] is not None:
             html = loader.get_template('monitor/agregar-usuario.html')
             mensaje = ''
             tipo_mensaje = ''
@@ -132,12 +119,12 @@ def agregar_usuario(request):
 
 def editar_usuario(request, _id):
     try:
-        if request.session['esta_logueado']:
+        if request.session['usuario_autenticado'] is not None:
             html = loader.get_template('monitor/editar-usuario.html')
             mensaje = ''
             tipo_mensaje = ''
             persona = Persona.objects.get(id=_id)
-            usuario = Usuario.objects.get(persona__id=persona.id)
+            usuario = Usuario.objects.select_related().get(persona__id=persona.id)
             if request.method == 'POST':
                 try:
                     persona.cedula = request.POST.get('cedula', '')
@@ -154,10 +141,7 @@ def editar_usuario(request, _id):
                     tipo_mensaje = 'error'
             contexto = {
                 'usuario_autenticado': request.session['usuario_autenticado'],
-                'cedula': persona.cedula,
-                'nombre': persona.nombre,
-                'apellido': persona.apellido,
-                'tipo': usuario.tipo,
+                'usuario': usuario,
                 'mensaje': mensaje,
                 'tipo_mensaje': tipo_mensaje
             }
@@ -170,7 +154,7 @@ def editar_usuario(request, _id):
 
 def eliminar_usuario(request, _id):
     try:
-        if request.session['esta_logueado']:
+        if request.session['usuario_autenticado'] is not None:
             usuario_autenticado = request.session['usuario_autenticado']
             if _id != 1 and _id != usuario_autenticado['id']:
                 usuario = Persona.objects.get(id=_id)
@@ -181,26 +165,41 @@ def eliminar_usuario(request, _id):
     except Exception:
         return redirect('/')
 
-def pacientes(request, _id):
+def pacientes(request):
     try:
-        if request.session['esta_logueado']:
+        if request.session['usuario_autenticado'] is not None:
             html = loader.get_template('monitor/pacientes.html')
-            resultado = Usuario.objects.all()
-            usuarios = []
-            for usuario in resultado:
-                usuarios.append({
-                    'id': usuario.persona.id,
-                    'cedula': usuario.persona.cedula,
-                    'nombre': usuario.persona.nombre,
-                    'apellido': usuario.persona.apellido,
-                    'tipo': usuario.tipo
-                })
+            resultado = Usuario.objects.select_related().all()
+            usuarios = [usuario.persona.cedula for usuario in resultado]
+            pacientes = Persona.objects.exclude(cedula__in=usuarios)
             contexto = {
                 'usuario_autenticado': request.session['usuario_autenticado'],
-                'usuarios': usuarios
+                'pacientes': pacientes
             }
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception:
-        return redirect('/')
+    except Exception as e:
+        print(e)
+
+def agregar_paciente(request):
+    try:
+        if request.session['usuario_autenticado'] is not None:
+            html = loader.get_template('monitor/agregar-paciente.html')
+            mensaje = ''
+            tipo_mensaje = ''
+            resultado = Usuario.objects.select_related().all()
+            usuarios = [usuario.__json__() for usuario in resultado]
+            if request.method == 'POST':
+                pass
+            contexto = {
+                'usuario_autenticado': request.session['usuario_autenticado'],
+                'usuarios': usuarios,
+                'mensaje': mensaje,
+                'tipo_mensaje': tipo_mensaje
+            }
+            return HttpResponse(html.render(contexto, request))
+        else:
+            return redirect('/')
+    except Exception as e:
+        print(e)
