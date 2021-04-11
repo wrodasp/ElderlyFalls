@@ -89,13 +89,21 @@ def agregar_usuario(request):
             tipo_mensaje = ''
             if request.method == 'POST':
                 _correo = request.POST.get('correo', '')
-                resultado = Usuario.objects.filter(correo=_correo)
-                if len(resultado) == 0:
-                    _persona = Persona(
-                        nombre=request.POST.get('nombre', ''),
-                        apellido=request.POST.get('apellido', '')
-                    )
-                    _persona.save()
+                usuarios = Usuario.objects.filter(correo=_correo)
+                if len(usuarios) == 0:
+                    _cedula = request.POST.get('cedula', '')
+                    personas = Persona.objects.filter(cedula=_cedula)
+                    pacientes = Paciente.objects.select_related().filter(persona__cedula=_cedula)
+                    if len(personas) == 0 and len(pacientes) == 0:
+                        _persona = Persona(
+                            cedula=_cedula,
+                            nombre=request.POST.get('nombre', ''),
+                            apellido=request.POST.get('apellido', '')
+                        )
+                    else:
+                        mensaje = 'Operación fallida. Esta persona es un paciente.'
+                        tipo_mensaje = 'error'
+                        _persona.save()
                     usuario = Usuario(
                         persona=_persona,
                         correo=_correo,
@@ -192,7 +200,7 @@ def agregar_paciente(request):
                 pass
             contexto = {
                 'usuario_autenticado': request.session['usuario_autenticado'],
-                'usuarios': usuarios,
+
                 'mensaje': mensaje,
                 'tipo_mensaje': tipo_mensaje
             }

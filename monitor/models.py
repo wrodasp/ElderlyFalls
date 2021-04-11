@@ -51,7 +51,7 @@ class Paciente(models.Model):
 
 class Contacto(models.Model):
     familiar = models.OneToOneField(Persona, on_delete=models.CASCADE)
-    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
+    paciente = models.OneToOneField(Paciente, on_delete=models.CASCADE)
     telefono = models.TextField(max_length=10, unique=True)
 
     def __str__(self):
