@@ -39,30 +39,26 @@
                <div class="container row mx-auto my-5">
                     <form class="form-group mx-auto border-thin" style="width: 50%" method="POST">
                          {% csrf_token %}
-                         <div class="col-md-4">
-                              <h5 class="text-center">Nuevo paciente</h5>
-                              {% if tipo_mensaje == "exito" %}
-                                   <div class="alert alert-success text-center" role="alert">
-                                        {{mensaje}}
-                                   </div>
-                              {% elif tipo_mensaje == "error" %}
-                                   <div class="alert alert-danger text-center" role="alert">
-                                        {{mensaje}}
-                                   </div>
-                              {% endif %}
-                              <input class="form-control text-center mt-2 mx-auto"
-                                     style="width: 70%" type="text" maxlength="50"
-                                     name="nombre" placeholder="Nombre" required>
-                              <input class="form-control text-center mt-2 mx-auto"
-                                     style="width: 70%" type="text" maxlength="50"
-                                     name="apellido" placeholder="Apellido" required>
-                              <input class="form-control text-center mt-2 mx-auto"
-                                     style="width: 70%" type="date" maxlength="50"
-                                     name="fecha-nacimiento" placeholder="Fecha de nacimiento" required>
-                         </div>
-                         <div class="col-md-8">
-
-                         </div>
+                         <h5 class="text-center mt-3">Nuevo usuario</h5>
+                         {% if tipo_mensaje == "exito" %}
+                              <div class="alert alert-success text-center mt-2" role="alert">
+                                   {{mensaje}}
+                              </div>
+                         {% elif tipo_mensaje == "error" %}
+                              <div class="alert alert-danger text-center mt-2" role="alert">
+                                   {{mensaje}}
+                              </div>
+                         {% endif %}
+                         <input class="form-control text-center mt-3 mx-auto"
+                                style="width: 70%" type="text" pattern="[0-9]{10}"
+                                name="cedula" placeholder="Cédula"
+                                maxlength="10" onkeypress="return esNumero(event)" required>
+                         <input class="form-control text-center mt-2 mx-auto"
+                                style="width: 70%" type="text" maxlength="50"
+                                name="nombre" placeholder="Nombre" required>
+                         <input class="form-control text-center mt-2 mx-auto"
+                                style="width: 70%" type="text" maxlength="50"
+                                name="apellido" placeholder="Apellido" required>
                          <button class="form-control text-center btn-primary mx-auto mt-3 mb-5"
                                  style="width:35%" type="submit">Registrar
                          </button>

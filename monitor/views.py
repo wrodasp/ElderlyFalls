@@ -201,3 +201,40 @@ def agregar_paciente(request):
             return redirect('/')
     except Exception as e:
         print(e)
+
+def editar_paciente(request, _id):
+    try:
+        if request.session['usuario_autenticado'] is not None:
+            html = loader.get_template('monitor/editar-paciente.html')
+            mensaje = ''
+            tipo_mensaje = ''
+
+            if request.method == 'POST':
+                pass
+            contexto = {
+                'usuario_autenticado': request.session['usuario_autenticado'],
+                'mensaje': mensaje,
+                'tipo_mensaje': tipo_mensaje
+            }
+            return HttpResponse(html.render(contexto, request))
+        else:
+            return redirect('/')
+    except Exception as e:
+        print(e)
+
+def eliminar_paciente(request, _id):
+    try:
+        if request.session['usuario_autenticado'] is not None:
+            mensaje = ''
+            tipo_mensaje = ''
+
+            if request.method == 'POST':
+                pass
+            contexto = {
+                'usuario_autenticado': request.session['usuario_autenticado']
+            }
+            return redirect('/administracion/pacientes')
+        else:
+            return redirect('/')
+    except Exception as e:
+        print(e)

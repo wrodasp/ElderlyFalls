@@ -35,12 +35,13 @@
                     <table class="table table-wrapper vertical-scroll mx-4 my-2">
                          <thead>
                               <tr class="row justify-content-center text-center">
+                                   <th class="col">Cedula</th>
                                    <th class="col">Nombre</th>
                                    <th class="col">Apellido</th>
                                    <th class="col">Fecha de nacimiento</th>
                                    <th class="col">
                                         <a class="btn btn-info text-center"
-                                           href="/administracion/usuarios/agregar"
+                                           href="/administracion/pacientes/agregar"
                                            role="button">Agregar
                                         </a>
                                    </th>
@@ -50,6 +51,7 @@
                               {% if pacientes %}
                                    {% for paciente in pacientes %}
                                         <tr class="row justify-content-center text-center">
+                                             <td class="col">{{paciente.persona.cedula}}</td>
                                              <td class="col">{{paciente.persona.nombre}}</td>
                                              <td class="col">{{paciente.persona.apellido}}</td>
                                              <td class="col">{{paciente.fecha_nacimiento}}</td>

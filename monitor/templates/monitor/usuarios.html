@@ -34,6 +34,7 @@
                <table class="table vertical-scroll mx-auto mt-4" style="width: 90%">
                     <thead class="mx-auto">
                          <tr class="row justify-content-center text-center">
+                              <th class="col">Cédula</th>
                               <th class="col">Nombre</th>
                               <th class="col">Apellido</th>
                               <th class="col">Correo</th>
@@ -50,6 +51,7 @@
                          {% if usuarios %}
                               {% for usuario in usuarios %}
                                    <tr class="row justify-content-center text-center">
+                                        <td class="col">{{usuario.persona.cedula}}</td>
                                         <td class="col">{{usuario.persona.nombre}}</td>
                                         <td class="col">{{usuario.persona.apellido}}</td>
                                         <td class="col">{{usuario.correo}}</td>
