@@ -63,11 +63,15 @@
                                 style="width: 70%" type="email" pattern="[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})"
                                 name="correo" placeholder="Correo electrónico"
                                 maxlength="100" required>
+                         <input class="form-control text-center mt-2 mx-auto"
+                                style="width: 70%" type="tel" pattern="[0-9]{10}"
+                                name="telefono" placeholder="Número de celular"
+                                maxlength="15" onkeypress="return esNumero(event)" required>
                          <div class="text-center mt-2 mx-auto" style="width: 70%">
                               <select class="form-control" name="tipo" required>
                                    <option hidden disabled selected>Tipo de usuario</option>
-                                   <option value="admin">Administrador</option>
-                                   <option value="regular">Regular</option>
+                                   <option value="enfermero">Enfermero/Enfermera</option>
+                                   <option value="familiar">Familiar</option>
                               </select>
                          </div>
                          <input class="form-control text-center mt-2 mx-auto"

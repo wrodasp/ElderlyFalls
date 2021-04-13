@@ -50,9 +50,9 @@
                               </div>
                          {% endif %}
                          <input class="form-control text-center mt-3 mx-auto"
-                                style="width: 70%" type="email" pattern="[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})"
-                                name="correo" placeholder="Correo electrónico" maxlength="100"
-                                value={{usuario.persona.cedula}} required>
+                                style="width: 70%" type="text" pattern="[0-9]{10}"
+                                name="cedula" placeholder="Cédula"
+                                maxlength="10" onkeypress="return esNumero(event)" required>
                          <input class="form-control text-center mt-2 mx-auto"
                                 style="width: 70%" type="text" maxlength="50"
                                 name="nombre" placeholder="Nombre"
@@ -61,14 +61,23 @@
                                 style="width: 70%" type="text" maxlength="50"
                                 name="apellido" placeholder="Apellido"
                                 value={{usuario.persona.apellido}} required>
+                         <input class="form-control text-center mt-3 mx-auto"
+                                style="width: 70%" type="email" pattern="[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})"
+                                name="correo" placeholder="Correo electrónico" maxlength="100"
+                                value={{usuario.correo}} required>
+                         <input class="form-control text-center mt-2 mx-auto"
+                                style="width: 70%" type="tel" pattern="[0-9]{10}"
+                                name="telefono" placeholder="Número de celular"
+                                maxlength="15" onkeypress="return esNumero(event)"
+                                value="{{usuario.telefono}}" required>
                          <div class="text-center mt-2 mx-auto" style="width: 70%">
                               <select class="form-control" name="tipo" required>
                                    {% if usuario.tipo == "admin" %}
-                                        <option value="admin" selected>Administrador</option>
-                                        <option value="regular" >Regular</option>
+                                        <option value="enfermero" selected>Enfermero/Enfermera</option>
+                                        <option value="familiar">Familiar</option>
                                    {% else %}
-                                        <option value="admin">Administrador</option>
-                                        <option value="regular" selected>Regular</option>
+                                        <option value="enfermero">Enfermero/Enfermera</option>
+                                        <option value="familiar" selected>Familiar</option>
                                    {% endif %}
                               </select>
                          </div>

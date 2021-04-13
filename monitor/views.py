@@ -1,11 +1,25 @@
+import math
 from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import redirect
 from .models import Persona, Usuario, Contacto, Paciente, Caida
 
-def validar_usuario(correo, clave):
+def es_cedula_valida(cedula):
+    ultimo_digito = int(cedula[9])
+    multiplicador = [2, 1, 2, 1, 2, 1, 2, 1, 2]
+    auxiliar = map(lambda k: int(k), list(cedula))[0:9]
+    resultado = []
+    cedula = map(lambda x, j: (x, j), auxiliar, multiplicador)
+    for (i, j) in cedula:
+        if i * j < 10:
+            resultado.append(i * j)
+        else:
+            resultado.append((i * j) - 9)
+    return (ultimo_digito == int(math.ceil(float(sum(resultado)) / 10) * 10) - sum(resultado))
+
+def validar_credenciales(_correo, clave):
     try:
-        usuario = Usuario.objects.get(correo=correo)
+        usuario = Usuario.objects.filter(correo=_correo)
         return clave == usuario.clave
     except Exception:
         return None
@@ -20,7 +34,7 @@ def login(request):
             if request.method == 'POST':
                 correo = request.POST.get('correo', '')
                 clave = request.POST.get('clave', '')
-                usuario_valido = validar_usuario(correo, clave)
+                usuario_valido = validar_credenciales(correo, clave)
                 if usuario_valido is not None:
                     if usuario_valido:
                         usuario = Usuario.objects.select_related().get(correo=correo)
@@ -62,8 +76,7 @@ def administracion(request):
         else:
             return redirect('/')
     except Exception as e:
-        print(e)
-        #return redirect('/')
+        return redirect('/')
 
 def usuarios(request):
     try:
@@ -79,7 +92,7 @@ def usuarios(request):
         else:
             return redirect('/')
     except Exception:
-        return redirect('/')
+        return redirect('/administracion')
 
 def agregar_usuario(request):
     try:
@@ -88,33 +101,60 @@ def agregar_usuario(request):
             mensaje = ''
             tipo_mensaje = ''
             if request.method == 'POST':
-                _correo = request.POST.get('correo', '')
-                usuarios = Usuario.objects.filter(correo=_correo)
-                if len(usuarios) == 0:
-                    _cedula = request.POST.get('cedula', '')
-                    personas = Persona.objects.filter(cedula=_cedula)
-                    pacientes = Paciente.objects.select_related().filter(persona__cedula=_cedula)
-                    if len(personas) == 0 and len(pacientes) == 0:
-                        _persona = Persona(
-                            cedula=_cedula,
-                            nombre=request.POST.get('nombre', ''),
-                            apellido=request.POST.get('apellido', '')
-                        )
+                _cedula = request.POST.get('cedula', '')
+                if es_cedula_valida(_cedula):
+                    pacientes = Paciente.objects.filter(persona__cedula=_cedula)
+                    if len(pacientes) == 0:
+                        usuarios = Usuario.objects.filter(persona__cedula=_cedula)
+                        if len(usuarios) == 0:
+                            _correo = request.POST.get('correo', '')
+                            usuarios = Usuario.objects.filter(correo=_correo)
+                            if len(usuarios) == 0:
+                                _telefono = request.POST.get('telefono', '')
+                                usuarios = Usuario.objects.filter(telefono=_telefono)
+                                if len(usuarios) == 0:
+                                    _persona = Persona(
+                                        cedula=_cedula,
+                                        nombre=request.POST.get('nombre', ''),
+                                        apellido=request.POST.get('apellido', '')
+                                    )
+                                    _persona.save()
+                                    _usuario = Usuario(
+                                        persona=_persona,
+                                        correo=_correo,
+                                        telefono=_telefono,
+                                        clave=request.POST.get('clave', ''),
+                                        tipo=request.POST.get('tipo', '')
+                                    )
+                                    _usuario.save()
+                                    mensaje = 'Operación exitosa. Usuario registrado correctamente.'
+                                    tipo_mensaje = 'exito'
+                                else:
+                                    mensaje = (
+                                        'Operación fallida. Ya existe un usuario\n' +
+                                        'registrado con este número telefónico.'
+                                    )
+                                    tipo_mensaje = 'error'
+                            else:
+                                mensaje = (
+                                    'Operación fallida. Ya existe un usuario\n' +
+                                    'registrado con este correo electrónico.'
+                                )
+                                tipo_mensaje = 'error'
+                        else:
+                            mensaje = (
+                                'Operación fallida. Ya existe un usuario\n' +
+                                'registrado con esta cedula.'
+                            )
+                            tipo_mensaje = 'error'
                     else:
-                        mensaje = 'Operación fallida. Esta persona es un paciente.'
+                        mensaje = (
+                            'Operación fallida. La pesona con esta cédula\n' +
+                            'está registrado como un paciente.'
+                        )
                         tipo_mensaje = 'error'
-                        _persona.save()
-                    usuario = Usuario(
-                        persona=_persona,
-                        correo=_correo,
-                        clave=request.POST.get('clave', ''),
-                        tipo=request.POST.get('tipo', '')
-                    )
-                    usuario.save()
-                    mensaje = 'Operación exitosa. Usuario registrado correctamente.'
-                    tipo_mensaje = 'exito'
                 else:
-                    mensaje = 'Operación fallida. El usuario ya existe.'
+                    mensaje = 'Operación fallida. La cédula no es válida.'
                     tipo_mensaje = 'error'
             contexto = {
                 'usuario_autenticado': request.session['usuario_autenticado'],
@@ -125,7 +165,7 @@ def agregar_usuario(request):
         else:
             return redirect('/')
     except Exception:
-        return redirect('/')
+        return redirect('/administracion/usuarios')
 
 def editar_usuario(request, _id):
     try:
@@ -135,19 +175,68 @@ def editar_usuario(request, _id):
             tipo_mensaje = ''
             usuario = Usuario.objects.select_related().get(id=_id)
             if request.method == 'POST':
-                try:
-                    persona = usuario.persona
-                    persona.nombre = request.POST.get('nombre', '')
-                    persona.apellido = request.POST.get('apellido', '')
-                    persona.save()
-                    usuario.correo = request.POST.get('correo', '')
-                    usuario.clave = request.POST.get('clave', '')
-                    usuario.tipo = request.POST.get('tipo', '')
-                    usuario.save()
-                    mensaje = 'Operación exitosa. Usuario editado correctamente.'
-                    tipo_mensaje = 'exito'
-                except Exception:
-                    mensaje = 'Operación fallida. Usuario no editado.'
+                cedula = request.POST.get('cedula', '')
+                if es_cedula_valida(cedula):
+                    pacientes = Paciente.objects.filter(persona__cedula=cedula)
+                    if len(pacientes) == 0:
+                        usuarios = Usuario.objects.filter(
+                            persona__cedula=cedula
+                        ).exclude(
+                            id=usuario.id
+                        )
+                        if len(usuarios) == 0:
+                            _correo = request.POST.get('correo', '')
+                            usuarios = Usuario.objects.filter(
+                                correo=_correo
+                            ).exclude(
+                                id=usuario.id
+                            )
+                            if len(usuarios) == 0:
+                                _telefono = request.POST.get('telefono', '')
+                                usuarios = Usuario.objects.filter(
+                                    telefono=_telefono
+                                ).exclude(
+                                    id=usuario.id
+                                )
+                                if len(usuarios) == 0:
+                                    persona = usuario.persona
+                                    persona.cedula = cedula
+                                    persona.nombre = request.POST.get('nombre', '')
+                                    persona.apellido = request.POST.get('apellido', '')
+                                    persona.save()
+                                    usuario.correo = _correo
+                                    usuario.telefono = _telefono
+                                    usuario.clave = request.POST.get('clave', '')
+                                    usuario.tipo = request.POST.get('tipo', '')
+                                    usuario.save()
+                                    mensaje = 'Operación exitosa. Usuario editado correctamente.'
+                                    tipo_mensaje = 'exito'
+                                else:
+                                    mensaje = (
+                                        'Operación fallida. Ya existe un usuario\n' +
+                                        'registrado con este número telefónico.'
+                                    )
+                                    tipo_mensaje = 'error'
+                            else:
+                                mensaje = (
+                                    'Operación fallida. Ya existe un usuario\n' +
+                                    'registrado con este correo electrónico.'
+                                )
+                                tipo_mensaje = 'error'
+                        else:
+                            mensaje = (
+                                'Operación fallida. Ya existe un usuario\n' +
+                                'registrado con esta cedula.'
+                            )
+                            tipo_mensaje = 'error'
+                    else:
+                        mensaje = (
+                            'Operación fallida. La persona con esta cédula\n' +
+                            'está registrada como un paciente.'
+                        )
+                        tipo_mensaje = 'error'
+                else:
+                    mensaje = 'Operación fallida. La cédula no es válida.'
                     tipo_mensaje = 'error'
             contexto = {
                 'usuario_autenticado': request.session['usuario_autenticado'],
@@ -158,8 +247,8 @@ def editar_usuario(request, _id):
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception as e:
-        return redirect('/')
+    except Exception:
+        return redirect('/administracion/usuarios')
 
 def eliminar_usuario(request, _id):
     try:
@@ -172,7 +261,7 @@ def eliminar_usuario(request, _id):
         else:
             return redirect('/')
     except Exception:
-        return redirect('/')
+        return redirect('/administracion/usuarios')
 
 def pacientes(request):
     try:
@@ -186,8 +275,8 @@ def pacientes(request):
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception as e:
-        return redirect('/')
+    except Exception:
+        return redirect('/administracion/pacientes')
 
 def agregar_paciente(request):
     try:
@@ -195,20 +284,64 @@ def agregar_paciente(request):
             html = loader.get_template('monitor/agregar-paciente.html')
             mensaje = ''
             tipo_mensaje = ''
-
             if request.method == 'POST':
-                pass
+                cedula_paciente = request.POST.get('cedula-paciente', '')
+                if es_cedula_valida(cedula_paciente):
+                    usuarios = Usuario.objects.filter(persona__cedula=cedula_paciente)
+                    if len(usuarios) == 0:
+                        pacientes = Paciente .objects.filter(persona__cedula=cedula_paciente)
+                        if len(pacientes) == 0:
+                            cedula_familiar = request.POST.get('cedula-familiar', '')
+                            if es_cedula_valida(cedula_familiar):
+                                familiares = Usuario.objects.filter(persona__cedula=cedula_familiar)
+                                if len(familiares) > 0:
+                                    _persona = Persona(
+                                        cedula=cedula_paciente,
+                                        nombre=request.POST.get('nombre', ''),
+                                        apellido=request.POST.get('apellido', '')
+                                    )
+                                    _persona.save()
+                                    contacto = Contacto(
+                                        familiar=familiares[0],
+                                        paciente=_persona
+                                    )
+                                    contacto.save()
+                                    mensaje = 'Operación exitosa. Paciente registrado correctamente.'
+                                    tipo_mensaje = 'exito'
+                                else:
+                                    mensaje = (
+                                        'Operación fallida. El contacto con la cédula especificada\n' +
+                                        'no se encuenta registrada como un enfermero/enfermera/familiar.'
+                                    )
+                                    tipo_mensaje = 'error'
+                            else:
+                                mensaje = 'Operación fallida. La cédula del contacto no es válida.'
+                                tipo_mensaje = 'error'
+                        else:
+                            mensaje = (
+                                'Operación fallida. Una persona con esta cédula ya se\n' +
+                                'encuenta registrada como un paciente.'
+                            )
+                            tipo_mensaje = 'error'
+                    else:
+                        mensaje = (
+                            'Operación fallida. Una persona con esta cédula ya se\n' +
+                            'encuentra registrada como un enfermero/enfermera/familiar.'
+                        )
+                        tipo_mensaje = 'error'
+                else:
+                    mensaje = 'Operación fallida. La cédula del paciente no es válida.'
+                    tipo_mensaje = 'error'
             contexto = {
                 'usuario_autenticado': request.session['usuario_autenticado'],
-
                 'mensaje': mensaje,
                 'tipo_mensaje': tipo_mensaje
             }
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception as e:
-        print(e)
+    except Exception:
+        return redirect('/administracion/pacientes')
 
 def editar_paciente(request, _id):
     try:
@@ -216,33 +349,94 @@ def editar_paciente(request, _id):
             html = loader.get_template('monitor/editar-paciente.html')
             mensaje = ''
             tipo_mensaje = ''
-
+            paciente = Paciente.objects.select_related().get(id=_id)
+            contacto = Contacto.objects.select_related().get(paciente__cedula=paciente.persona.cedula)
             if request.method == 'POST':
-                pass
+                cedula_paciente = request.POST.get('cedula-paciente', '')
+                if es_cedula_valida(cedula_paciente):
+                    cedula_familiar = request.POST.get('cedula-familiar', '')
+                    if es_cedula_valida(cedula_familiar):
+                        usuarios = Usuario.objects.filter(persona__cedula=cedula_paciente)
+                        if len(usuarios) == 0:
+                            pacientes = Paciente.objects.filter(
+                                persona__cedula=cedula_paciente
+                            ).exclude(id=paciente.id)
+                            if len(pacientes) == 0:
+                                paciente.cedula = cedula_paciente
+                                paciente.nombre = request.POST.get('nombre', '')
+                                paciente.apellido = request.POST.get('apellido', '')
+                                paciente.fecha_nacimiento = request.POST.get('fecha-nacimiento', '')
+                                paciente.save()
+                                if cedula_familiar != contacto.familiar.persona.cedula:
+                                    familiares = Usuario.objects.filter(
+                                        persona__cedula=cedula_familiar
+                                    ).exclude(id=contacto.familiar.id)
+                                    if len(familiares) > 0:
+                                        contacto.familiar = Usuario.objects.get(persona__cedula=cedula_familiar)
+                                        contacto.save()
+                                        mensaje = 'Operación exitosa. Paciente editado correctamente.'
+                                        tipo_mensaje = 'exito'
+                                    else:
+                                        mensaje = (
+                                            'Operación fallida. El contacto con la cédula especificada\n' +
+                                            'no se encuenta registrada como un enfermero/enfermera/familiar.'
+                                        )
+                                        tipo_mensaje = 'error'
+                                else:
+                                    mensaje = 'Operación exitosa. Paciente editado correctamente.'
+                                    tipo_mensaje = 'exito'
+                            else:
+                                mensaje = (
+                                    'Operación fallida. Una persona con esta cédula ya se\n' +
+                                    'encuenta registrada como un paciente.'
+                                )
+                                tipo_mensaje = 'error'
+                        else:
+                            mensaje = (
+                                'Operación fallida. Una persona con esta cédula ya se\n' +
+                                'encuentra registrada como un enfermero/enfermera/familiar.'
+                            )
+                            tipo_mensaje = 'error'
+                    else:
+                        mensaje = 'Operación fallida. La cédula del paciente no es válida.'
+                        tipo_mensaje = 'error'
+                else:
+                    mensaje = 'Operación fallida. La cédula del paciente no es válida.'
+                    tipo_mensaje = 'error'
             contexto = {
                 'usuario_autenticado': request.session['usuario_autenticado'],
+                'paciente': paciente,
+                'contacto': contacto,
                 'mensaje': mensaje,
                 'tipo_mensaje': tipo_mensaje
             }
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception as e:
-        print(e)
+    except Exception:
+        return redirect('/administracion/pacientes')
 
 def eliminar_paciente(request, _id):
     try:
         if request.session['usuario_autenticado'] is not None:
-            mensaje = ''
-            tipo_mensaje = ''
-
-            if request.method == 'POST':
-                pass
-            contexto = {
-                'usuario_autenticado': request.session['usuario_autenticado']
-            }
+            paciente = Paciente.objects.get(id=_id)
+            paciente.delete()
             return redirect('/administracion/pacientes')
         else:
             return redirect('/')
-    except Exception as e:
-        print(e)
+    except Exception:
+        return redirect('/administracion/pacientes')
+
+def ver_imagen(request):
+    try:
+        if request.session['usuario_autenticado'] is not None:
+            html = loader.get_template('monitor/ver-imagen.html')
+            url = request.POST.get('url', '')
+            contexto = {
+                'imagen': url
+            }
+            return HttpResponse(html.render(contexto, request))
+        else:
+            return redirect('/')
+    except Exception:
+        return redirect('/administracion/usuarios')
