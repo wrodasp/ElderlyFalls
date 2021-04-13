@@ -38,8 +38,14 @@ def login(request):
                 if usuario_valido is not None:
                     if usuario_valido:
                         usuario = Usuario.objects.select_related().get(correo=correo)
-                        request.session['usuario_autenticado'] = usuario.__json__()
-                        return redirect('administracion/')
+                        if usuario.tipo == 'enfermero':
+                            request.session['usuario_autenticado'] = usuario.__json__()
+                            return redirect('administracion/')
+                        else:
+                            mensaje = (
+                                'Inicio de sesión fallido. No se permiten\n.' +
+                                'usuario que no sean enfermeros o enfermeras.'
+                            )
                     else:
                         mensaje = 'Inicio de sesión fallido. La contraseña es incorrecta.'
                 else:
