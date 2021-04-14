@@ -52,7 +52,8 @@
                          <input class="form-control text-center mt-3 mx-auto"
                                 style="width: 70%" type="text" pattern="[0-9]{10}"
                                 name="cedula" placeholder="Cédula"
-                                maxlength="10" onkeypress="return esNumero(event)" required>
+                                maxlength="10" onkeypress="return esNumero(event)"
+                                value={{usuario.persona.cedula}} required>
                          <input class="form-control text-center mt-2 mx-auto"
                                 style="width: 70%" type="text" maxlength="50"
                                 name="nombre" placeholder="Nombre"

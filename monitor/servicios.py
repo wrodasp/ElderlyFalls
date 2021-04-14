@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializadores import CaidaSerializer
-from .views import validar_usuario
+from .views import validar_credenciales
 from .models import Caida
 
 class LoginService(APIView):
@@ -12,7 +12,7 @@ class LoginService(APIView):
             cedula = request.query_params.get('cedula')
             clave = request.query_params.get('clave')
             resultado = {
-                'resultado': validar_usuario(cedula, clave)
+                'resultado': validar_credenciales(cedula, clave)
             }
             return Response(resultado, content_type='text/plain')
         except Exception:

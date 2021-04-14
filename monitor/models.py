@@ -18,7 +18,7 @@ class Persona(models.Model):
         }
 
 class Usuario(models.Model):
-    correo = models.EmailField(max_length=255, unique=True,default='')
+    correo = models.EmailField(max_length=255, unique=True, default='')
     telefono = models.TextField(max_length=15, unique=True, default='')
     clave = models.TextField(max_length=30)
     tipo = models.TextField(max_length=10, default='familiar')
@@ -52,11 +52,11 @@ class Paciente(models.Model):
         }
 
 class Contacto(models.Model):
-    familiar = models.OneToOneField(Usuario, on_delete=models.CASCADE)
-    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
+    familiar = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    paciente = models.OneToOneField(Paciente, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.persona.__str__()} | {self.telefono}'
+        return f'{self.familiar.persona.__str__()} | {self.familiar.telefono}'
 
     def __json__(self):
         return {

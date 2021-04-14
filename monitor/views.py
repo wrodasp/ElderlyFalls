@@ -19,7 +19,7 @@ def es_cedula_valida(cedula):
 
 def validar_credenciales(_correo, clave):
     try:
-        usuario = Usuario.objects.filter(correo=_correo)
+        usuario = Usuario.objects.get(correo=_correo)
         return clave == usuario.clave
     except Exception:
         return None
@@ -356,7 +356,7 @@ def editar_paciente(request, _id):
             mensaje = ''
             tipo_mensaje = ''
             paciente = Paciente.objects.select_related().get(id=_id)
-            contacto = Contacto.objects.select_related().get(paciente__cedula=paciente.persona.cedula)
+            contacto = Contacto.objects.select_related().get(paciente__id=_id)
             if request.method == 'POST':
                 cedula_paciente = request.POST.get('cedula-paciente', '')
                 if es_cedula_valida(cedula_paciente):
@@ -419,7 +419,7 @@ def editar_paciente(request, _id):
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception:
+    except Exception as e:
         return redirect('/administracion/pacientes')
 
 def eliminar_paciente(request, _id):
