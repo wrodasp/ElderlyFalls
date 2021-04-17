@@ -72,7 +72,7 @@ class Caida(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, default=None)
 
     def __str__(self):
-        return f'{self.fecha.strftime("%b %d %Y %H:%M:%S")} | {self.ubicacion}'
+        return f'{self.fecha.strftime("%b %d %Y %H:%M:%S")} | {self.precision}'
 
     def __json__(self):
         return {
