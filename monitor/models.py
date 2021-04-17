@@ -67,7 +67,7 @@ class Contacto(models.Model):
 
 class Caida(models.Model):
     fecha = models.DateTimeField(auto_now=True)
-    presicion = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    precision = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     imagen = models.ImageField(upload_to='monitor/caidas')
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, default=None)
 
@@ -78,7 +78,7 @@ class Caida(models.Model):
         return {
             'id': self.id,
             'fecha': self.fecha.strftime("%b %d %Y %H:%M:%S"),
-            'presicion': self.presicion,
+            'precision': self.precision,
             'imagen': self.imagen,
             'paciente': self.paciente.__json__()
         }
