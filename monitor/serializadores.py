@@ -5,4 +5,4 @@ class CaidaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Caida
-        fields = ('id', 'fecha', 'presicion', 'imagen', 'paciente')
+        fields = ('id', 'fecha', 'precision', 'imagen', 'paciente')
