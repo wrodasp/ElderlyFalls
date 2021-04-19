@@ -22,7 +22,7 @@ class CaidaService(APIView):
 
     def get(self, request):
         try:
-            caidas = Caida.objects.all()
+            caidas = Caida.objects.select_related().all()
             serializer = CaidaSerializer(caidas, many=True)
             return Response(serializer.data)
         except Exception:
