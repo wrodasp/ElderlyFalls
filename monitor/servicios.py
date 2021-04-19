@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializadores import CaidaSerializer
 from .views import validar_credenciales
-from .models import Caida
+from .models import Caida, Contacto
 
 class LoginService(APIView):
 
@@ -22,8 +22,15 @@ class CaidaService(APIView):
 
     def get(self, request):
         try:
-            caidas = Caida.objects.select_related().all()
-            serializer = CaidaSerializer(caidas, many=True)
+            familiar_id = request.query_params.get('id')
+            data = []
+            contactos = Contacto.objects.select_related().filter(familiar__id=familiar_id)
+            for contacto in contactos:
+                caidas = contacto.paciente.caida_set.all()
+                for caida in caidas:
+                    data.append(caida)
+            serializer = CaidaSerializer(data, many=True)
             return Response(serializer.data)
-        except Exception:
+        except Exception as e:
+            print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
