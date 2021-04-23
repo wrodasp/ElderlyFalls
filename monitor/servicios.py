@@ -24,11 +24,14 @@ class CaidaService(APIView):
         try:
             familiar_id = request.query_params.get('id')
             data = []
-            contactos = Contacto.objects.select_related().filter(familiar__id=familiar_id)
-            for contacto in contactos:
-                caidas = contacto.paciente.caida_set.all()
-                for caida in caidas:
-                    data.append(caida)
+            if familiar_id is not None:
+                contactos = Contacto.objects.select_related().filter(familiar__id=familiar_id)
+                for contacto in contactos:
+                    caidas = contacto.paciente.caida_set.all()
+                    for caida in caidas:
+                        data.append(caida)
+            else:
+                data = Caida.objects.select_related().all()
             serializer = CaidaSerializer(data, many=True)
             return Response(serializer.data)
         except Exception as e:
