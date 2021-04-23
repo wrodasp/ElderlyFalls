@@ -1,21 +1,22 @@
-import math
 from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import redirect
 from .models import Persona, Usuario, Contacto, Paciente, Caida
 
 def es_cedula_valida(cedula):
-    ultimo_digito = int(cedula[9])
-    multiplicador = [2, 1, 2, 1, 2, 1, 2, 1, 2]
-    auxiliar = map(lambda k: int(k), list(cedula))[0:9]
-    resultado = []
-    cedula = map(lambda x, j: (x, j), auxiliar, multiplicador)
-    for (i, j) in cedula:
-        if i * j < 10:
-            resultado.append(i * j)
+    coeficientes  = [2, 1, 2, 1, 2, 1, 2, 1, 2]
+    suma = 0
+    for indice in range(len(cedula) - 1):
+        resultado = int(cedula[indice]) * coeficientes[indice]
+        if resultado > 9:
+            suma += (resultado - 9)
         else:
-            resultado.append((i * j) - 9)
-    return (ultimo_digito == int(math.ceil(float(sum(resultado)) / 10) * 10) - sum(resultado))
+            suma += resultado
+    resultado = ((int(suma / 10) + 1) * 10) - suma
+    if resultado  == 10:
+        return int(cedula[9]) == 0
+    else:
+        return resultado == int(cedula[9])
 
 def validar_credenciales(_correo, clave):
     try:
