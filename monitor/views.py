@@ -21,7 +21,10 @@ def es_cedula_valida(cedula):
 def validar_credenciales(_correo, clave):
     try:
         usuario = Usuario.objects.get(correo=_correo)
-        return clave == usuario.clave
+        if clave == usuario.clave:
+            return ("true"+str(usuario.id))
+        else:
+            return "false"
     except Exception:
         return None
 

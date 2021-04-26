@@ -11,9 +11,7 @@ class LoginService(APIView):
         try:
             cedula = request.query_params.get('cedula')
             clave = request.query_params.get('clave')
-            resultado = {
-                'resultado': validar_credenciales(cedula, clave)
-            }
+            resultado = validar_credenciales(cedula, clave)
             return Response(resultado, content_type='text/plain')
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
