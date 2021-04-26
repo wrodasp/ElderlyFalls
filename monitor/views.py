@@ -44,8 +44,8 @@ def login(request):
                             return redirect('administracion/')
                         else:
                             mensaje = (
-                                'Inicio de sesión fallido. No se permiten\n.' +
-                                'usuario que no sean enfermeros o enfermeras.'
+                                'Inicio de sesión fallido. No se permiten\n' +
+                                'usuarios que no sean enfermeros o enfermeras.'
                             )
                     else:
                         mensaje = 'Inicio de sesión fallido. La contraseña es incorrecta.'
