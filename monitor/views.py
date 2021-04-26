@@ -22,9 +22,9 @@ def validar_credenciales(_correo, clave):
     try:
         usuario = Usuario.objects.get(correo=_correo)
         if clave == usuario.clave:
-            return ("true"+str(usuario.id))
+            return ('true' + str(usuario.id))
         else:
-            return "false"
+            return 'false'
     except Exception:
         return None
 
@@ -40,7 +40,7 @@ def login(request):
                 clave = request.POST.get('clave', '')
                 usuario_valido = validar_credenciales(correo, clave)
                 if usuario_valido is not None:
-                    if usuario_valido:
+                    if 'true' in usuario_valido:
                         usuario = Usuario.objects.select_related().get(correo=correo)
                         if usuario.tipo == 'enfermero':
                             request.session['usuario_autenticado'] = usuario.__json__()
