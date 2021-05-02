@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializadores import CaidaSerializer
 from .views import validar_credenciales
-from .models import Caida, Contacto
+from .models import Caida, Contacto, Paciente
+from datetime import datetime
 
 class LoginService(APIView):
 
@@ -32,6 +33,22 @@ class CaidaService(APIView):
                 data = Caida.objects.select_related().all()
             serializer = CaidaSerializer(data, many=True)
             return Response(serializer.data)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        try:
+            _fecha = datetime.now()
+            _imagen = request.data.get('imgbinary')
+            _precision = request.data.get('precision')
+            _paciente = Paciente.objects.all()[0]
+            caida = Caida(
+                fecha=_fecha,
+                precision=_precision,
+                paciente=_paciente
+            )
+            caida.imagen.save(str(_fecha), _imagen)
+            return Response(status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
