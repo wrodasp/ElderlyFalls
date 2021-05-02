@@ -5,6 +5,7 @@ from .serializadores import CaidaSerializer
 from .views import validar_credenciales
 from .models import Caida, Contacto, Paciente
 from datetime import datetime
+import base64
 
 class LoginService(APIView):
 
@@ -39,7 +40,7 @@ class CaidaService(APIView):
     def post(self, request):
         try:
             _fecha = datetime.now()
-            _imagen = request.data.get('imgbinary')
+            _imagen = base64.b64decode((request.data.get('imgbinary'))) 
             _precision = request.data.get('precision')
             _paciente = Paciente.objects.all()[0]
             caida = Caida(
