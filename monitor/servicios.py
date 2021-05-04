@@ -37,7 +37,7 @@ class CaidaService(APIView):
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request):
+    def post(self, request):
         try:
             _fecha = datetime.now()
             _imagen = base64.b64decode((request.data.get('imgbinary')))
