@@ -40,7 +40,8 @@ class CaidaService(APIView):
     def post(self, request):
         try:
             _fecha = datetime.now()
-            _imagen = base64.b64decode((request.data.get('imgbinary')))
+            _imagen = open('imagen', 'wb')
+            _imagen.write(base64.b64decode((request.data.get('imgbinary'))))
             _precision = request.data.get('precision')
             _paciente = Paciente.objects.all()[0]
             caida = Caida(
@@ -49,6 +50,7 @@ class CaidaService(APIView):
                 paciente=_paciente
             )
             caida.imagen.save(str(_fecha), _imagen)
+            _imagen.close()
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
