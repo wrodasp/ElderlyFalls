@@ -1,3 +1,4 @@
+from django.core.files import File
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -42,6 +43,8 @@ class CaidaService(APIView):
             _fecha = datetime.now()
             _imagen = open('imagen', 'wb')
             _imagen.write(base64.b64decode((request.data.get('imgbinary'))))
+            _imagen.close()
+            _imagen = open('imagen', 'rb')
             _precision = request.data.get('precision')
             _paciente = Paciente.objects.all()[0]
             caida = Caida(
@@ -49,7 +52,7 @@ class CaidaService(APIView):
                 precision=_precision,
                 paciente=_paciente
             )
-            caida.imagen.save(str(_fecha), _imagen)
+            caida.imagen.save(str(_fecha), File(_imagen))
             _imagen.close()
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
