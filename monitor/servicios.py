@@ -17,6 +17,7 @@ class LoginService(APIView):
             resultado = validar_credenciales(cedula, clave)
             return Response(resultado, content_type='text/plain')
         except Exception:
+            print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class CaidaService(APIView):
@@ -36,25 +37,52 @@ class CaidaService(APIView):
             serializer = CaidaSerializer(data, many=True)
             return Response(serializer.data)
         except Exception as e:
+            print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         try:
             _fecha = datetime.now()
-            _imagen = open('imagen', 'wb')
-            _imagen.write(base64.b64decode((request.data.get('imgbinary'))))
-            _imagen.close()
-            _imagen = open('imagen', 'rb')
             _precision = request.data.get('precision')
             _paciente = Paciente.objects.all()[0]
-            caida = Caida(
-                fecha=_fecha,
-                precision=_precision,
-                paciente=_paciente
-            )
-            caida.imagen.save(str(_fecha), File(_imagen))
-            _imagen.close()
+            datos_imagen = base64.b64decode((request.data.get('imgbinary')))
+            with open('imagen.aux', 'w+b') as _imagen:
+                caida = Caida(
+                    fecha=_fecha,
+                    precision=_precision,
+                    paciente=_paciente
+                )
+                _imagen.write(datos_imagen)
+                caida.imagen.save(str(_fecha), File(_imagen))
             return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class ImagenService(APIView):
+
+    def get(self, request):
+        try:
+            _id = request.query_params.get('id')
+            caida = Caida.objects.get(id=_id)
+            imagen = open(caida.imagen.path, 'rb')
+            data = base64.b64encode(imagen.read())
+            imagen.close()
+            return Response(data, content_type='text/plain')
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class RevisarCaidaService(APIView):
+
+    def get(self, request):
+        try:
+            _id = request.query_params.get('id')
+            caida = Caida.objects.get(id=_id)
+            caida.revisado = True
+            caida.save()
+            serializer = CaidaSerializer(caida, many=False)
+            return Response(serializer.data, content_type='text/plain')
         except Exception as e:
             print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -39,7 +39,7 @@
                <div class="container row mx-auto my-5">
                     <form class="form-group mx-auto border-thin" style="width: 50%" method="POST">
                          {% csrf_token %}
-                         <h5 class="text-center mt-3">Nuevo paciente</h5>
+                         <h5 class="text-center mt-3">Editar paciente</h5>
                          {% if tipo_mensaje == "exito" %}
                               <div class="alert alert-success text-center mt-2" role="alert">
                                    {{mensaje}}
@@ -64,10 +64,9 @@
                                 value="{{paciente.persona.apellido}}" required>
                          <input class="form-control text-center mt-2 mx-auto"
                                 style="width: 70%" type="text" name="fecha-nacimiento"
-                                placeholder="Fecha de nacimiento"
+                                placeholder="{{paciente.fecha_nacimiento}}"
                                 onfocus="(this.type='date')"
-                                onfocusout ="(this.type='text')"
-                                value="{{paciente.fecha_nacimiento}}" required>
+                                onfocusout ="(this.type='text')">
                          <h5 class="text-center mt-4">Contacto</h5>
                          <input class="form-control text-center mt-2 mx-auto"
                                 style="width: 70%" type="text" pattern="[0-9]{10}"

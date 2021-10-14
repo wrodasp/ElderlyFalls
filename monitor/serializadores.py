@@ -28,7 +28,7 @@ class CaidaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Caida
-        fields = ('id', 'fecha', 'precision', 'imagen', 'paciente')
+        fields = ('id', 'fecha', 'precision', 'imagen', 'paciente', 'revisado')
 
     def create(self, validated_data):
         paciente_validated_data = validated_data.pop('paciente')

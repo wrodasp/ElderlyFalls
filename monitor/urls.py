@@ -18,5 +18,7 @@ urlpatterns = [
     path('administracion/pacientes/eliminar/<int:_id>', views.eliminar_paciente),
     #API REST
     path('rest/validar-usuario', servicios.LoginService.as_view()),
-    path('rest/caidas', servicios.CaidaService.as_view())
+    path('rest/caidas', servicios.CaidaService.as_view()),
+    path('rest/imagen-caida', servicios.ImagenService.as_view()),
+    path('rest/revisar-caida', servicios.RevisarCaidaService.as_view())
 ]

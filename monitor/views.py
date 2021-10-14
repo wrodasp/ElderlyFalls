@@ -25,7 +25,8 @@ def validar_credenciales(_correo, clave):
             return ('true' + str(usuario.id))
         else:
             return 'false'
-    except Exception:
+    except Exception as e:
+        print(e)
         return None
 
 def login(request):
@@ -58,7 +59,8 @@ def login(request):
                 'mensaje': mensaje
             }
             return HttpResponse(html.render(contexto, request))
-    except Exception:
+    except Exception as e:
+        print(e)
         request.session['usuario_autenticado'] = None
         return redirect('/')
 
@@ -67,7 +69,8 @@ def logout(request):
         if request.session['usuario_autenticado'] is not None:
             del request.session['usuario_autenticado']
         return redirect('/')
-    except Exception:
+    except Exception as e:
+        print(e)
         return redirect('/')
 
 def administracion(request):
@@ -86,6 +89,7 @@ def administracion(request):
         else:
             return redirect('/')
     except Exception as e:
+        print(e)
         return redirect('/')
 
 def usuarios(request):
@@ -101,7 +105,8 @@ def usuarios(request):
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception:
+    except Exception as e:
+        print(e)
         return redirect('/administracion')
 
 def agregar_usuario(request):
@@ -174,7 +179,8 @@ def agregar_usuario(request):
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception:
+    except Exception as e:
+        print(e)
         return redirect('/administracion/usuarios')
 
 def editar_usuario(request, _id):
@@ -257,7 +263,8 @@ def editar_usuario(request, _id):
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception:
+    except Exception as e:
+        print(e)
         return redirect('/administracion/usuarios')
 
 def eliminar_usuario(request, _id):
@@ -265,12 +272,15 @@ def eliminar_usuario(request, _id):
         if request.session['usuario_autenticado'] is not None:
             usuario_autenticado = request.session['usuario_autenticado']
             if _id != 1 and _id != usuario_autenticado['id']:
-                usuario = Persona.objects.get(id=_id)
+                usuario = Usuario.objects.get(id=_id)
+                persona = usuario.persona
                 usuario.delete()
+                persona.delete()
             return redirect('/administracion/usuarios')
         else:
             return redirect('/')
-    except Exception:
+    except Exception as e:
+        print(e)
         return redirect('/administracion/usuarios')
 
 def pacientes(request):
@@ -285,7 +295,8 @@ def pacientes(request):
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception:
+    except Exception as e:
+        print(e)
         return redirect('/administracion/pacientes')
 
 def agregar_paciente(request):
@@ -311,9 +322,13 @@ def agregar_paciente(request):
                                         apellido=request.POST.get('apellido', '')
                                     )
                                     _persona.save()
+                                    _paciente = Paciente(
+                                        persona=_persona,
+                                        fecha_nacimiento=request.POST.get('fecha-nacimiento', '')
+                                    )
                                     contacto = Contacto(
                                         familiar=familiares[0],
-                                        paciente=_persona
+                                        paciente=_paciente
                                     )
                                     contacto.save()
                                     mensaje = 'Operación exitosa. Paciente registrado correctamente.'
@@ -350,7 +365,8 @@ def agregar_paciente(request):
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception:
+    except Exception as e:
+        print(e)
         return redirect('/administracion/pacientes')
 
 def editar_paciente(request, _id):
@@ -373,10 +389,13 @@ def editar_paciente(request, _id):
                             ).exclude(id=paciente.id)
                             if len(pacientes) == 0:
                                 paciente.cedula = cedula_paciente
-                                paciente.nombre = request.POST.get('nombre', '')
-                                paciente.apellido = request.POST.get('apellido', '')
-                                paciente.fecha_nacimiento = request.POST.get('fecha-nacimiento', '')
+                                paciente.persona.nombre = request.POST.get('nombre', '')
+                                paciente.persona.apellido = request.POST.get('apellido', '')
+                                fecha_nacimiento = request.POST.get('fecha-nacimiento', '')
+                                if fecha_nacimiento != '':
+                                    paciente.fecha_nacimiento = fecha_nacimiento
                                 paciente.save()
+                                paciente.persona.save()
                                 if cedula_familiar != contacto.familiar.persona.cedula:
                                     familiares = Usuario.objects.filter(
                                         persona__cedula=cedula_familiar
@@ -384,7 +403,7 @@ def editar_paciente(request, _id):
                                     if len(familiares) > 0:
                                         contacto.familiar = Usuario.objects.get(persona__cedula=cedula_familiar)
                                         contacto.save()
-                                        mensaje = 'Operación exitosa. Paciente editado correctamente.'
+                                        mensaje = 'Operación exitosa. Paciente editado correctamente 1.'
                                         tipo_mensaje = 'exito'
                                     else:
                                         mensaje = (
@@ -393,7 +412,7 @@ def editar_paciente(request, _id):
                                         )
                                         tipo_mensaje = 'error'
                                 else:
-                                    mensaje = 'Operación exitosa. Paciente editado correctamente.'
+                                    mensaje = 'Operación exitosa. Paciente editado correctamente 2.'
                                     tipo_mensaje = 'exito'
                             else:
                                 mensaje = (
@@ -424,17 +443,21 @@ def editar_paciente(request, _id):
         else:
             return redirect('/')
     except Exception as e:
+        print(e)
         return redirect('/administracion/pacientes')
 
 def eliminar_paciente(request, _id):
     try:
         if request.session['usuario_autenticado'] is not None:
             paciente = Paciente.objects.get(id=_id)
+            persona = paciente.persona
             paciente.delete()
+            persona.delete()
             return redirect('/administracion/pacientes')
         else:
             return redirect('/')
-    except Exception:
+    except Exception as e:
+        print(e)
         return redirect('/administracion/pacientes')
 
 def ver_imagen(request):
@@ -448,5 +471,6 @@ def ver_imagen(request):
             return HttpResponse(html.render(contexto, request))
         else:
             return redirect('/')
-    except Exception:
+    except Exception as e:
+        print(e)
         return redirect('/administracion/usuarios')
